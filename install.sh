@@ -1,15 +1,15 @@
 #!/bin/bash
 #
-# PTC Harness Installation Script
+# DotTools Installation Script
 # 
-# Install with: curl -fsSL https://ptc-harness.dev/install.sh | bash
-# Or: curl -fsSL https://raw.githubusercontent.com/user/repo/main/install.sh | bash
+# Install with: curl -fsSL https://cdn.pcstyle.dev/ptc/install.sh | bash
+# Or: curl -fsSL https://raw.githubusercontent.com/pc-style/dottools/main/install.sh | bash
 #
 
 set -e
 
 PTC_VERSION="1.0.0"
-REPO_URL="${PTC_REPO:-https://github.com/yourusername/ptc-harness}"
+REPO_URL="${PTC_REPO:-https://github.com/pc-style/dottools}"
 INSTALL_DIR="${PTC_INSTALL_DIR:-.}"
 
 # Colors
@@ -65,7 +65,7 @@ check_deps() {
 install_ptc() {
   local target_dir="$1"
   
-  log_info "Installing PTC Harness v$PTC_VERSION to $target_dir/.tools"
+  log_info "Installing DotTools v$PTC_VERSION to $target_dir/.tools"
   
   # Create target directory
   mkdir -p "$target_dir"
@@ -110,7 +110,7 @@ install_ptc() {
   chmod +x .tools/executor.ts 2>/dev/null || true
   chmod +x .tools/executor.sh
   
-  log_success "PTC Harness installed successfully!"
+  log_success "DotTools installed successfully!"
 }
 
 # Update AGENTS.md
@@ -232,7 +232,7 @@ EOF
 print_usage() {
   cat << 'EOF'
 
-PTC Harness Installation
+DotTools Installation
 ========================
 
 Usage: install.sh [OPTIONS]
@@ -249,13 +249,13 @@ Environment Variables:
 
 Examples:
   # Install to current directory
-  curl -fsSL https://ptc-harness.dev/install.sh | bash
+  curl -fsSL https://cdn.pcstyle.dev/ptc/install.sh | bash
 
   # Install to specific directory
-  curl -fsSL https://ptc-harness.dev/install.sh | bash -s -- -d /path/to/project
+  curl -fsSL https://cdn.pcstyle.dev/ptc/install.sh | bash -s -- -d /path/to/project
 
   # Install from local development copy
-  PTC_LOCAL_PATH=./ptc-harness ./install.sh
+  PTC_LOCAL_PATH=./dottools ./install.sh
 
 EOF
 }
@@ -292,7 +292,7 @@ main() {
   
   echo ""
   echo "╔════════════════════════════════════════╗"
-  echo "║     PTC Harness Installation           ║"
+  echo "║         DotTools Installation          ║"
   echo "║     Version $PTC_VERSION                   ║"
   echo "╚════════════════════════════════════════╝"
   echo ""

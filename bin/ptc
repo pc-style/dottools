@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# PTC CLI - Command Line Interface for PTC Harness
+# DotTools CLI - Command Line Interface for DotTools
 #
 
 set -e
@@ -19,7 +19,7 @@ NC='\033[0m'
 # Help message
 show_help() {
   cat << EOF
-PTC Harness CLI v$PTC_VERSION
+DotTools CLI v$PTC_VERSION
 
 Usage: ptc <command> [options]
 
@@ -38,16 +38,16 @@ Examples:
   ptc list                              # List all tools
   ptc add-tool my-custom-tool           # Create custom tool
 
-For more information, visit: https://ptc-harness.dev
+For more information, visit: https://cdn.pcstyle.dev/ptc/install.sh
 EOF
 }
 
 # Initialize PTC
 init_ptc() {
-  echo -e "${BLUE}Initializing PTC Harness...${NC}"
+  echo -e "${BLUE}Initializing DotTools...${NC}"
   
   if [ -d ".tools" ]; then
-    echo -e "${YELLOW}PTC is already initialized in this directory${NC}"
+    echo -e "${YELLOW}DotTools is already initialized in this directory${NC}"
     exit 0
   fi
   
@@ -57,7 +57,7 @@ init_ptc() {
   else
     # Try to install from GitHub
     if command -v curl > /dev/null 2>&1; then
-      curl -fsSL https://ptc-harness.dev/install.sh | bash
+      curl -fsSL https://cdn.pcstyle.dev/ptc/install.sh | bash
     else
       echo -e "${RED}Error: Cannot find PTC installation${NC}"
       exit 1
@@ -67,7 +67,7 @@ init_ptc() {
   chmod +x .tools/executor.ts 2>/dev/null || true
   chmod +x .tools/executor.sh
   
-  echo -e "${GREEN}✓ PTC initialized successfully${NC}"
+  echo -e "${GREEN}✓ DotTools initialized successfully${NC}"
   echo ""
   echo "Next steps:"
   echo "  1. Check AGENTS.md for usage information"
@@ -180,7 +180,7 @@ show_docs() {
 
 # Show version
 show_version() {
-  echo "PTC Harness CLI v$PTC_VERSION"
+  echo "DotTools CLI v$PTC_VERSION"
 }
 
 # Main

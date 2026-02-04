@@ -1,11 +1,12 @@
 {
-  "name": "ptc-harness",
+  "name": "dottools",
   "version": "1.0.0",
   "description": "Programmatic Tool Calling Harness - Universal tool execution for AI agents",
   "main": "index.js",
   "bin": {
     "ptc": "bin/ptc",
-    "ptc-harness": "bin/ptc"
+    "dottools": "bin/ptc",
+    "ptc": "bin/ptc"
   },
   "scripts": {
     "test": "deno test",
@@ -29,12 +30,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/ptc-harness.git"
+    "url": "https://github.com/pc-style/dottools.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/ptc-harness/issues"
+    "url": "https://github.com/pc-style/dottools/issues"
   },
-  "homepage": "https://github.com/yourusername/ptc-harness#readme",
+  "homepage": "https://github.com/pc-style/dottools#readme",
   "engines": {
     "node": ">=16.0.0"
   },

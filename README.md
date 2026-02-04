@@ -1,11 +1,11 @@
-# PTC Harness
+# DotTools
 
 **Programmatic Tool Calling Harness** - Universal tool execution for AI agents
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/yourusername/ptc-harness)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/pc-style/dottools)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-PTC Harness enables AI coding agents to write and execute code that orchestrates multiple tools in a single pass, dramatically reducing token usage and latency compared to traditional sequential tool calling.
+DotTools enables AI coding agents to write and execute code that orchestrates multiple tools in a single pass, dramatically reducing token usage and latency compared to traditional sequential tool calling.
 
 ## Features
 
@@ -23,17 +23,17 @@ PTC Harness enables AI coding agents to write and execute code that orchestrates
 
 **Option 1: curl | bash (Recommended)**
 ```bash
-curl -fsSL https://ptc-harness.dev/install.sh | bash
+curl -fsSL https://cdn.pcstyle.dev/ptc/install.sh | bash
 ```
 
 **Option 2: npx**
 ```bash
-npx ptc-harness init
+npx dottools init
 ```
 
 **Option 3: Manual**
 ```bash
-git clone https://github.com/yourusername/ptc-harness.git .tools
+git clone https://github.com/pc-style/dottools.git .tools
 ```
 
 ### Basic Usage
@@ -161,7 +161,7 @@ if (response.success) {
 return { saved: false, error: response.error };
 ```
 
-## Why Programmatic Tool Calling?
+## Why DotTools?
 
 Traditional AI agents call tools one at a time:
 ```
@@ -208,22 +208,22 @@ const result = await tools.custom.myTool({ query: "test" });
 
 ```bash
 # Initialize in current directory
-ptc init
+dottools init
 
 # Execute code
-ptc exec <<'CODE'
+dottools exec <<'CODE'
 const result = await tools.fs.read({ path: "README.md" });
 return result;
 CODE
 
 # List all tools
-ptc list
+dottools list
 
 # Create custom tool template
-ptc add-tool my-custom-tool
+dottools add-tool my-custom-tool
 
 # View documentation
-ptc docs
+dottools docs
 ```
 
 ## Configuration
