@@ -1,0 +1,260 @@
+# AGENTS.md Template
+
+## Programmatic Tool Calling
+
+This project has `.tools/` installed which enables **programmatic tool calling** for AI agents.
+
+### What is Programmatic Tool Calling?
+
+Instead of calling tools one at a time (traditional approach), you can write code that orchestrates multiple tools in a single pass. This reduces token usage, latency, and allows for complex workflows with loops, conditionals, and error handling.
+
+**Traditional approach:**
+```
+Call tool 1 → Wait → Call tool 2 → Wait → Call tool 3 → Done
+```
+
+**Programmatic approach:**
+```
+Write code → Execute (tools run programmatically) → Done
+```
+
+### Quick Start
+
+**TypeScript (requires Deno):**
+```bash
+.tools/executor.ts <<'CODE'
+const files = await tools.fs.glob({ pattern: "**/*.ts" });
+const results = [];
+
+for (const file of files.files) {
+  const content = await tools.fs.read({ path: file });
+  if (content.exists) {
+    results.push({ file, size: content.size });
+  }
+}
+
+return results;
+CODE
+```
+
+**Shell (no dependencies):**
+```bash
+.tools/executor.sh <<'CODE'
+# Use function-based tools
+echo "$(tools_fs_read '{"path":"README.md"}' | jq -r '.content')"
+CODE
+```
+
+### Available Tools
+
+#### Filesystem (`tools.fs.*`)
+- `tools.fs.read({ path, encoding? })` - Read file contents
+- `tools.fs.write({ path, content, append? })` - Write to file
+- `tools.fs.glob({ pattern, root?, dot?, maxDepth? })` - Find files
+- `tools.fs.mkdir({ path, recursive? })` - Create directory
+- `tools.fs.delete({ path, recursive? })` - Delete file/directory
+
+#### Git (`tools.git.*`)
+- `tools.git.status({ path? })` - Get repository status
+- `tools.git.diff({ path?, from?, to?, file? })` - Compare commits
+- `tools.git.commit({ path?, message, all?, files? })` - Create commit
+- `tools.git.log({ path?, limit?, file?, stat? })` - View history
+- `tools.git.branch({ path?, list?, create?, switch?, delete? })` - Manage branches
+
+#### HTTP (`tools.http.*`)
+- `tools.http.fetch({ url, headers?, followRedirects?, timeout? })` - GET request
+- `tools.http.post({ url, body?, contentType?, headers?, timeout? })` - POST request
+- `tools.http.download({ url, destination, headers?, timeout? })` - Download file
+
+#### Search (`tools.search.*`)
+- `tools.search.grep({ pattern, path?, recursive?, ignoreCase?, maxResults? })` - Search content
+- `tools.search.find({ path?, name?, pattern?, type?, maxDepth? })` - Find files
+
+#### Shell (`tools.shell.*`)
+- `tools.shell.exec({ command, args?, cwd?, env?, timeout? })` - Execute commands
+
+### Progress Reporting
+
+Use the `progress()` function to provide real-time updates:
+
+```typescript
+progress("Starting task");
+const files = await tools.fs.glob({ pattern: "**/*.md" });
+progress("Found files", { count: files.count });
+
+for (let i = 0; i < files.files.length; i++) {
+  await processFile(files.files[i]);
+  progress("Processing", { current: i + 1, total: files.files.length });
+}
+
+progress("Complete", { processed: files.files.length });
+```
+
+Progress logs are included in the execution result.
+
+### Examples
+
+**Find all TODOs in the codebase:**
+```typescript
+const files = await tools.fs.glob({ pattern: "**/*.{ts,js,md}" });
+const todos = [];
+
+for (const file of files.files) {
+  const content = await tools.fs.read({ path: file });
+  if (content.exists) {
+    const matches = content.content.match(/TODO.*/g);
+    if (matches) {
+      todos.push({ file, items: matches });
+    }
+  }
+}
+
+return { totalFiles: files.count, filesWithTodos: todos.length, todos };
+```
+
+**Check git status and auto-commit:**
+```typescript
+const status = await tools.git.status();
+
+if (!status.isClean) {
+  progress("Staging changes", { modified: status.modified.length });
+  await tools.git.commit({
+    message: "chore: automated updates",
+    all: true
+  });
+  return { committed: true, branch: status.branch };
+}
+
+return { committed: false, reason: "No changes" };
+```
+
+**Download and process data:**
+```typescript
+const response = await tools.http.fetch({ 
+  url: "https://api.example.com/data" 
+});
+
+if (response.success) {
+  const data = JSON.parse(response.body);
+  
+  // Save to file
+  await tools.fs.write({
+    path: "data.json",
+    content: JSON.stringify(data, null, 2)
+  });
+  
+  return { saved: true, items: data.length };
+}
+
+return { saved: false, error: response.error };
+```
+
+### Adding Custom Tools
+
+Create a file at `.tools/tools/custom/my-tool.ts`:
+
+```typescript
+export interface Input {
+  query: string;
+}
+
+export interface Output {
+  result: string;
+  success: boolean;
+}
+
+export default async function myTool(input: Input): Promise<Output> {
+  // Implementation
+  return { result: `Processed: ${input.query}`, success: true };
+}
+```
+
+Then use it:
+```typescript
+const result = await tools.custom.myTool({ query: "test" });
+```
+
+### Full Documentation
+
+See `.tools/sdk/TOOLS.md` for complete documentation including:
+- Detailed input/output schemas
+- Error handling patterns
+- Advanced examples
+- Best practices
+
+### CLI Commands
+
+```bash
+# Initialize PTC in this directory
+ptc init
+
+# List all available tools
+ptc list
+
+# Create a new custom tool template
+ptc add-tool my-custom-tool
+
+# View documentation
+ptc docs
+
+# Check version
+ptc version
+```
+
+### Configuration
+
+Edit `.tools/ptc.json` to customize:
+- Executor preferences
+- Tool availability
+- Sandbox settings
+- Logging options
+
+### Error Handling
+
+All tools return a `success` boolean. Always check this:
+
+```typescript
+const result = await tools.fs.read({ path: "file.txt" });
+
+if (!result.success) {
+  console.error("Failed:", result.error);
+  return { error: result.error };
+}
+
+// Use result.content
+```
+
+For git operations, also check `isRepo`:
+
+```typescript
+const status = await tools.git.status();
+if (!status.isRepo) {
+  return { error: "Not a git repository" };
+}
+```
+
+### Dependencies
+
+**Required:**
+- Bash (any modern version)
+
+**Recommended:**
+- Deno 2.0+ (for TypeScript support)
+- jq (for better JSON handling)
+- curl (for HTTP tools)
+- git (for Git tools)
+
+### Why Use This?
+
+1. **Reduced Token Usage**: Intermediate results don't bloat context
+2. **Lower Latency**: Single round-trip for multi-tool workflows
+3. **Complex Logic**: Use loops, conditionals, error handling
+4. **Batch Processing**: Process thousands of items efficiently
+5. **Consistency**: Structured JSON input/output
+6. **Universal**: Works with any AI agent that can run shell commands
+
+### Links
+
+- Full Documentation: `.tools/sdk/TOOLS.md`
+- Configuration: `.tools/ptc.json`
+- Source Code: `.tools/`

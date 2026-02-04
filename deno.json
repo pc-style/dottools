@@ -1,0 +1,42 @@
+{
+  "name": "ptc-harness",
+  "version": "1.0.0",
+  "exports": "./.tools/sdk/types.ts",
+  "tasks": {
+    "test": "deno test",
+    "lint": "deno lint",
+    "fmt": "deno fmt",
+    "check": "deno check .tools/executor.ts"
+  },
+  "fmt": {
+    "useTabs": false,
+    "lineWidth": 100,
+    "indentWidth": 2,
+    "semiColons": true,
+    "singleQuote": false,
+    "proseWrap": "preserve"
+  },
+  "lint": {
+    "files": {
+      "include": [
+        ".tools/"
+      ],
+      "exclude": [
+        ".tools/tools/**/*.sh"
+      ]
+    },
+    "rules": {
+      "tags": ["recommended"]
+    }
+  },
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noImplicitReturns": true,
+    "noUncheckedIndexedAccess": true
+  },
+  "imports": {
+    "@std/": "https://deno.land/std@0.220.0/"
+  }
+}

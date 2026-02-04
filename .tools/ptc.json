@@ -1,0 +1,30 @@
+{
+  "version": "1.0.0",
+  "executor": {
+    "primary": "deno",
+    "fallback": "bash",
+    "timeout": 30000
+  },
+  "sandbox": {
+    "enabled": false,
+    "permissions": {
+      "read": true,
+      "write": true,
+      "net": true,
+      "env": true,
+      "run": true
+    }
+  },
+  "tools": {
+    "builtin": ["fs", "git", "http", "search", "shell"],
+    "custom": []
+  },
+  "agentsMd": {
+    "autoUpdate": true,
+    "section": "## Programmatic Tool Calling"
+  },
+  "logging": {
+    "level": "info",
+    "progress": true
+  }
+}

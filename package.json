@@ -1,0 +1,48 @@
+{
+  "name": "ptc-harness",
+  "version": "1.0.0",
+  "description": "Programmatic Tool Calling Harness - Universal tool execution for AI agents",
+  "main": "index.js",
+  "bin": {
+    "ptc": "bin/ptc",
+    "ptc-harness": "bin/ptc"
+  },
+  "scripts": {
+    "test": "deno test",
+    "lint": "deno lint",
+    "fmt": "deno fmt",
+    "check": "deno check .tools/executor.ts"
+  },
+  "keywords": [
+    "ai",
+    "agents",
+    "tools",
+    "programmatic-tool-calling",
+    "ptc",
+    "claude",
+    "gpt",
+    "automation",
+    "shell",
+    "deno"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/ptc-harness.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/ptc-harness/issues"
+  },
+  "homepage": "https://github.com/yourusername/ptc-harness#readme",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "files": [
+    ".tools/**/*",
+    "bin/**/*",
+    "install.sh",
+    "README.md",
+    "LICENSE"
+  ]
+}

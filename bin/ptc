@@ -1,0 +1,221 @@
+#!/bin/bash
+#
+# PTC CLI - Command Line Interface for PTC Harness
+#
+
+set -e
+
+PTC_VERSION="1.0.0"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PTC_DIR="${PTC_DIR:-$SCRIPT_DIR/../.tools}"
+
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m'
+
+# Help message
+show_help() {
+  cat << EOF
+PTC Harness CLI v$PTC_VERSION
+
+Usage: ptc <command> [options]
+
+Commands:
+  init                Initialize PTC in current directory
+  exec                Execute code using PTC executor
+  list                List available tools
+  add-tool <name>     Create a new custom tool
+  docs                Open documentation
+  version             Show version
+  help                Show this help message
+
+Examples:
+  ptc init                              # Initialize PTC
+  ptc exec <<'CODE' ... CODE            # Execute code
+  ptc list                              # List all tools
+  ptc add-tool my-custom-tool           # Create custom tool
+
+For more information, visit: https://ptc-harness.dev
+EOF
+}
+
+# Initialize PTC
+init_ptc() {
+  echo -e "${BLUE}Initializing PTC Harness...${NC}"
+  
+  if [ -d ".tools" ]; then
+    echo -e "${YELLOW}PTC is already initialized in this directory${NC}"
+    exit 0
+  fi
+  
+  # Find the PTC installation
+  if [ -d "$PTC_DIR" ]; then
+    cp -r "$PTC_DIR" .
+  else
+    # Try to install from GitHub
+    if command -v curl > /dev/null 2>&1; then
+      curl -fsSL https://ptc-harness.dev/install.sh | bash
+    else
+      echo -e "${RED}Error: Cannot find PTC installation${NC}"
+      exit 1
+    fi
+  fi
+  
+  chmod +x .tools/executor.ts 2>/dev/null || true
+  chmod +x .tools/executor.sh
+  
+  echo -e "${GREEN}✓ PTC initialized successfully${NC}"
+  echo ""
+  echo "Next steps:"
+  echo "  1. Check AGENTS.md for usage information"
+  echo "  2. Try: .tools/executor.sh <<'CODE' echo 'hello' CODE"
+}
+
+# Execute code
+exec_code() {
+  if [ ! -d ".tools" ]; then
+    echo -e "${RED}Error: PTC not initialized. Run: ptc init${NC}"
+    exit 1
+  fi
+  
+  # Check for Deno
+  if command -v deno > /dev/null 2>&1 && [ -f ".tools/executor.ts" ]; then
+    .tools/executor.ts
+  else
+    .tools/executor.sh
+  fi
+}
+
+# List available tools
+list_tools() {
+  if [ ! -d ".tools/tools" ]; then
+    echo -e "${RED}Error: PTC not initialized. Run: ptc init${NC}"
+    exit 1
+  fi
+  
+  echo -e "${BLUE}Available Tools:${NC}"
+  echo ""
+  
+  for namespace in .tools/tools/*/; do
+    if [ -d "$namespace" ]; then
+      local name=$(basename "$namespace")
+      echo -e "${GREEN}$name/${NC}"
+      
+      for tool in "$namespace"*.ts; do
+        if [ -f "$tool" ]; then
+          local tool_name=$(basename "$tool" .ts)
+          [ "$tool_name" != "" ] && echo "  - $tool_name"
+        fi
+      done
+      echo ""
+    fi
+  done
+}
+
+# Add custom tool
+add_tool() {
+  local tool_name="$1"
+  
+  if [ -z "$tool_name" ]; then
+    echo -e "${RED}Error: Tool name required${NC}"
+    echo "Usage: ptc add-tool <name>"
+    exit 1
+  fi
+  
+  if [ ! -d ".tools/tools/custom" ]; then
+    mkdir -p .tools/tools/custom
+  fi
+  
+  local tool_file=".tools/tools/custom/${tool_name}.ts"
+  
+  if [ -f "$tool_file" ]; then
+    echo -e "${YELLOW}Warning: Tool already exists: $tool_file${NC}"
+    exit 1
+  fi
+  
+  cat > "$tool_file" << EOF
+/**
+ * Custom Tool: $tool_name
+ */
+
+export interface Input {
+  // Define your input parameters here
+  query: string;
+}
+
+export interface Output {
+  // Define your output here
+  result: string;
+  success: boolean;
+}
+
+export default async function $tool_name(input: Input): Promise<Output> {
+  // TODO: Implement your tool logic here
+  
+  return {
+    result: \`Processed: \${input.query}\`,
+    success: true,
+  };
+}
+EOF
+
+  echo -e "${GREEN}✓ Created tool: $tool_file${NC}"
+  echo ""
+  echo "Next steps:"
+  echo "  1. Edit $tool_file to implement your tool"
+  echo "  2. Use it: await tools.custom.$tool_name({ query: \"test\" })"
+}
+
+# Show docs
+show_docs() {
+  if [ -f ".tools/sdk/TOOLS.md" ]; then
+    cat .tools/sdk/TOOLS.md
+  else
+    echo "Documentation not found. Make sure PTC is initialized."
+  fi
+}
+
+# Show version
+show_version() {
+  echo "PTC Harness CLI v$PTC_VERSION"
+}
+
+# Main
+main() {
+  local command="${1:-help}"
+  
+  case "$command" in
+    init)
+      init_ptc
+      ;;
+    exec)
+      exec_code
+      ;;
+    list|ls)
+      list_tools
+      ;;
+    add-tool|add)
+      shift
+      add_tool "$@"
+      ;;
+    docs|doc)
+      show_docs
+      ;;
+    version|--version|-v)
+      show_version
+      ;;
+    help|--help|-h)
+      show_help
+      ;;
+    *)
+      echo -e "${RED}Unknown command: $command${NC}"
+      show_help
+      exit 1
+      ;;
+  esac
+}
+
+main "$@"
